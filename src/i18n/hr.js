@@ -1,7 +1,5 @@
 
-import Formalizer from '../formalizer';
-
-Formalizer.translations = {
+const translations = {
     'missing_value': 'Polje ne smije biti prazno',
     'value_too_short': 'Unos treba sadržavati %s ili više znakova',
     'value_too_long': 'Unos treba sadržavati %s ili manje znakova',
@@ -10,3 +8,5 @@ Formalizer.translations = {
     'number_greater_than': 'Vrijednost treba biti jednaka ili manja od %s',
     'invalid_email': 'Neispravna email adresa',
 };
+
+export { translations };

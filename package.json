@@ -1,18 +1,30 @@
 {
-  "name": "@edkirin/formalizer",
-  "version": "0.1.0",
-  "description": "Simple form validity checker",
-  "main": "src/formalizer.js",
-  "scripts": {
-    "build": "grunt build",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "form",
-    "validator"
-  ],
-  "author": "Eden Kirin",
-  "license": "ISC",
-  "dependencies": {},
-  "devDependencies": {}
+    "name": "@edkirin/formalizer",
+    "version": "0.1.0",
+    "description": "Simple form validity checker",
+    "main": "src/formalizer.js",
+    "scripts": {
+        "build": "webpack --mode=production --display-modules --devtool=''",
+        "dev": "webpack --mode=development --watch"
+    },
+    "keywords": [
+        "form",
+        "validator"
+    ],
+    "author": {
+        "name": "Eden Kirin",
+        "email": "edkirin@gmail.com"
+    },
+    "license": "ISC",
+    "dependencies": {},
+    "devDependencies": {
+        "@babel/core": "^7.11.1",
+        "@babel/preset-env": "^7.11.0",
+        "babel-eslint": "^10.1.0",
+        "babel-loader": "^8.1.0",
+        "clean-webpack-plugin": "^3.0.0",
+        "eslint": "^7.6.0",
+        "webpack": "^4.44.1",
+        "webpack-cli": "^3.3.12"
+    }
 }

@@ -15,8 +15,8 @@ export default class Formalizer {
     errorTemplate;
     validateOn;
     handleSubmitButton;
-    translations;
 
+    _translations;
     _firstInvalidElement;
 
     // ----------------------------------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ export default class Formalizer {
         this.form.setAttribute('novalidate', 'novalidate');
 
         // load translations
-        require('./i18n/' + this.language);
+        this._translations = require('./i18n/' + this.language).translations;
 
         switch (this.validateOn) {
             case 'submit':
@@ -345,8 +345,8 @@ export default class Formalizer {
     // ----------------------------------------------------------------------------------------------------------------
 
     getTranslationString(id) {
-        return Formalizer.translations && Formalizer.translations.hasOwnProperty(id) ?
-            Formalizer.translations[id] :
+        return this._translations && this._translations.hasOwnProperty(id) ?
+        this._translations[id] :
             'Unknown translation id ' + id;
     }
 
