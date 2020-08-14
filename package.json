@@ -1,9 +1,10 @@
 {
   "name": "@edkirin/formalizer",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Simple form validity checker",
   "main": "src/formalizer.js",
   "scripts": {
+    "build": "grunt build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -11,5 +12,7 @@
     "validator"
   ],
   "author": "Eden Kirin",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {}
 }
