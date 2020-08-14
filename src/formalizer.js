@@ -12,6 +12,7 @@ export default class Formalizer {
     onInvalidElement;
     language;
     errorReporting;
+    errorTemplate;
     validateOn;
     handleSubmitButton;
     translations;
@@ -28,14 +29,18 @@ export default class Formalizer {
         this.onValidate = options.hasOwnProperty('onValidate') ? options.onValidate : null;
         this.onInvalidElement = options.hasOwnProperty('onInvalidElement') ? options.onInvalidElement : null;
         this.language = options.hasOwnProperty('language') ? options.language : 'en';
-        // valid values: none, hint, tooltip, errelement
+        // valid values: none, hint, tooltip, element
         this.errorReporting = options.hasOwnProperty('errorReporting') ? options.errorReporting : 'hint';
+        this.errorTemplate = options.hasOwnProperty('errorTemplate') ? options.errorTemplate : null;
         this.handleSubmitButton = options.hasOwnProperty('handleSubmitButton') ? options.handleSubmitButton : false;
         // valid values: manual, submit, input, focus
         this.validateOn = options.hasOwnProperty('validateOn') ? options.validateOn : 'submit';
 
         // disable browser validation
         this.form.setAttribute('novalidate', 'novalidate');
+
+        // load translations
+        require('./i18n/' + this.language);
 
         switch (this.validateOn) {
             case 'submit':
@@ -184,7 +189,7 @@ export default class Formalizer {
                     element.setAttribute('title', '');
                     break;
 
-                case 'errelement':
+                case 'element':
                     // get error element id from element dataset
                     const elementId = element.dataset['errElementId'];
                     // remove error element from dom
@@ -205,8 +210,15 @@ export default class Formalizer {
 
     // ----------------------------------------------------------------------------------------------------------------
 
-    raiseError(element, errorCode) {
-        const errorMessage = this.getTranslationString(errorCode);
+    raiseError(element, errorCode, params) {
+        let errMessage = this.getTranslationString(errorCode);
+
+        // replace value placeholders with provided params
+        if (params) {
+            params.forEach((param) => {
+                errMessage = errMessage.replace(/%s/, param);
+            })
+        }
 
         if (this._firstInvalidElement === null) {
             this._firstInvalidElement = element;
@@ -220,22 +232,30 @@ export default class Formalizer {
                 break;
 
             case 'hint':
-                element.setAttribute('title', errorMessage);
+                element.setAttribute('title', errMessage);
                 break;
 
-            case 'errelement':
+            case 'element':
                 // create random id for a new error element
                 const elementId = this.randomStr(10);
+
                 // create error element html
-                const errElement = `<small class="form-text text-danger" id=${elementId}>${errorMessage}</small>`;
+                let errElement;
+                if (this.errorTemplate) {
+                    errElement = this.errorTemplate.replace(/%id/, elementId).replace(/%message/, errMessage);
+                } else {
+                    errElement = `<small class="form-text text-danger" id=${elementId}>${errMessage}</small>`;
+                }
+
                 // set data attribute to element, pointing to error element
                 element.dataset['errElementId'] = elementId;
+
                 // finally, add error element html right after element
                 element.insertAdjacentHTML('afterend', errElement);
                 break;
 
             case 'tooltip':
-                element.setAttribute('title', errorMessage);
+                element.setAttribute('title', errMessage);
                 break;
         }
     }
@@ -248,11 +268,11 @@ export default class Formalizer {
         const maxlength = parseInt(element.getAttribute('maxlength'));
 
         if (!isNaN(minlength) && element.value.length < minlength) {
-            this.raiseError(element, 'value_too_short');
+            this.raiseError(element, 'value_too_short', [minlength]);
             result = false;
         }
         if (!isNaN(maxlength) && element.value.length > maxlength) {
-            this.raiseError(element, 'value_too_long');
+            this.raiseError(element, 'value_too_long', [maxlength]);
             result = false;
         }
 
@@ -272,11 +292,11 @@ export default class Formalizer {
             const min = parseInt(element.getAttribute('min'));
             const max = parseInt(element.getAttribute('max'));
             if (!isNaN(min) && element.value < min) {
-                this.raiseError(element, 'number_less_than');
+                this.raiseError(element, 'number_less_than', [min]);
                 result = false;
             }
             if (!isNaN(max) && element.value > max) {
-                this.raiseError(element, 'number_greater_than');
+                this.raiseError(element, 'number_greater_than', [max]);
                 result = false;
             }
         }
@@ -325,11 +345,9 @@ export default class Formalizer {
     // ----------------------------------------------------------------------------------------------------------------
 
     getTranslationString(id) {
-        if (Formalizer.translations.hasOwnProperty(id)) {
-            return Formalizer.translations[id];
-        } else {
-            return 'Unknown translation id ' + id;
-        }
+        return Formalizer.translations && Formalizer.translations.hasOwnProperty(id) ?
+            Formalizer.translations[id] :
+            'Unknown translation id ' + id;
     }
 
     // ----------------------------------------------------------------------------------------------------------------
