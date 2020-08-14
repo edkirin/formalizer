@@ -8,8 +8,12 @@ export default class Formalizer {
     invalidClass;
     validClass;
     focusOnError;
+    onValidate;
+    onInvalidElement;
     language;
     errorReporting;
+    validateOn;
+    handleSubmitButton;
     translations;
 
     _firstInvalidElement;
@@ -21,25 +25,54 @@ export default class Formalizer {
         this.invalidClass = options.hasOwnProperty('invalidClass') ? options.invalidClass : 'is-invalid';
         this.validClass = options.hasOwnProperty('validClass') ? options.validClass : 'is-valid';
         this.focusOnError = options.hasOwnProperty('focusOnError') ? options.focusOnError : true;
+        this.onValidate = options.hasOwnProperty('onValidate') ? options.onValidate : null;
         this.onInvalidElement = options.hasOwnProperty('onInvalidElement') ? options.onInvalidElement : null;
         this.language = options.hasOwnProperty('language') ? options.language : 'en';
-        // valid values: none, title, tooltip
-        this.errorReporting = options.hasOwnProperty('errorReporting') ? options.errorReporting : 'title';
+        // valid values: none, hint, tooltip, errelement
+        this.errorReporting = options.hasOwnProperty('errorReporting') ? options.errorReporting : 'hint';
+        this.handleSubmitButton = options.hasOwnProperty('handleSubmitButton') ? options.handleSubmitButton : false;
+        // valid values: manual, submit, input, focus
+        this.validateOn = options.hasOwnProperty('validateOn') ? options.validateOn : 'submit';
 
         // disable browser validation
         this.form.setAttribute('novalidate', 'novalidate');
 
-        // hook to submit event
-        const onSubmitHandler = this.onSubmit.bind(this);
-        this.form.addEventListener('submit', onSubmitHandler);
+        switch (this.validateOn) {
+            case 'submit':
+                // hook to submit event
+                this.form.addEventListener('submit', this.onSubmitHandler.bind(this));
+                break;
+            case 'input':
+                // hook to keyup event
+                const handler = this.onKeypressHandler.bind(this);
+                this.getElementsForValidation().forEach((element) => {
+                    element.addEventListener('keyup', handler);
+                });
+                break;
+            case 'focus':
+                break;
+            default:
+                // default - no handling
+                break;
+        }
+
+        if (this.handleSubmitButton) {
+            this.validate();
+        }
     }
 
     // ----------------------------------------------------------------------------------------------------------------
 
-    onSubmit(event) {
+    onSubmitHandler(event) {
         if (!this.validate()) {
             event.preventDefault();
         }
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+
+    onKeypressHandler(event) {
+        this.validate();
     }
 
     // ----------------------------------------------------------------------------------------------------------------
@@ -76,24 +109,27 @@ export default class Formalizer {
                 }
             }
 
-            switch (element.tagName.toLowerCase()) {
-                case 'input':
-                    switch (element.getAttribute('type')) {
-                        case 'text':
-                            elementValid &= this.validateTextElement(element);
-                            break;
-                        case 'number':
-                            elementValid &= this.validateNumberElement(element);
-                            break;
-                        case 'email':
-                            elementValid &= this.validateEmailElement(element);
-                            break;
-                    }
-                    break;
+            if (elementValid) {
+                // check other levels of validity only if not missing value
+                switch (element.tagName.toLowerCase()) {
+                    case 'input':
+                        switch (element.getAttribute('type')) {
+                            case 'text':
+                                elementValid &= this.validateTextElement(element);
+                                break;
+                            case 'number':
+                                elementValid &= this.validateNumberElement(element);
+                                break;
+                            case 'email':
+                                elementValid &= this.validateEmailElement(element);
+                                break;
+                        }
+                        break;
 
-                case 'textarea':
-                    elementValid &= this.validateTextElement(element);
-                    break;
+                    case 'textarea':
+                        elementValid &= this.validateTextElement(element);
+                        break;
+                }
             }
 
             this.setElementValidity(element, elementValid);
@@ -101,8 +137,30 @@ export default class Formalizer {
             formValid &= elementValid;
         });
 
-        if (this.focusOnError && !formValid && this._firstInvalidElement) {
+        // focus on first input element with error, if errors found
+        if (this.validateOn === 'submit' && this.focusOnError && !formValid && this._firstInvalidElement) {
             this._firstInvalidElement.focus();
+        }
+
+        // enable / disable submit button
+        if (this.handleSubmitButton) {
+            const submitBtn = this.form.querySelectorAll('button[type="submit"]');
+            submitBtn.forEach((element) => {
+                if (formValid) {
+                    element.removeAttribute('disabled');
+                } else {
+                    element.setAttribute('disabled', 'disabled');
+                }
+            });
+        }
+
+        // call onValidate callback, if defined
+        if (this.onValidate) {
+            this.onValidate({
+                formalizer: this,
+                form: this.form,
+                valid: formValid,
+            });
         }
 
         return formValid;
@@ -121,10 +179,25 @@ export default class Formalizer {
             switch (this.errorReporting) {
                 case 'none':
                     break;
-                case 'title':
+
+                case 'hint':
                     element.setAttribute('title', '');
                     break;
+
+                case 'errelement':
+                    // get error element id from element dataset
+                    const elementId = element.dataset['errElementId'];
+                    // remove error element from dom
+                    const errElement = document.getElementById(elementId);
+                    if (errElement) {
+                        errElement.remove();
+                        // reset dataset
+                        element.dataset['errElementId'] = '';
+                        }
+                    break;
+
                 case 'tooltip':
+                    element.setAttribute('title', '');
                     break;
             }
         });
@@ -145,14 +218,26 @@ export default class Formalizer {
         switch (this.errorReporting) {
             case 'none':
                 break;
-            case 'title':
+
+            case 'hint':
                 element.setAttribute('title', errorMessage);
                 break;
+
+            case 'errelement':
+                // create random id for a new error element
+                const elementId = this.randomStr(10);
+                // create error element html
+                const errElement = `<small class="form-text text-danger" id=${elementId}>${errorMessage}</small>`;
+                // set data attribute to element, pointing to error element
+                element.dataset['errElementId'] = elementId;
+                // finally, add error element html right after element
+                element.insertAdjacentHTML('afterend', errElement);
+                break;
+
             case 'tooltip':
+                element.setAttribute('title', errorMessage);
                 break;
         }
-
-        console.log(element.getAttribute('name') + ': ' + errorMessage);
     }
 
     // ----------------------------------------------------------------------------------------------------------------
@@ -246,6 +331,18 @@ export default class Formalizer {
             return 'Unknown translation id ' + id;
         }
     }
+
+    // ----------------------------------------------------------------------------------------------------------------
+
+    randomStr(len) {
+        const chars = 'abcdefghijklmnopqrstuvwxyz';
+        let result = '';
+
+        for (let i = 0; i < len; i++) {
+           result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+     }
 
     // ----------------------------------------------------------------------------------------------------------------
 
