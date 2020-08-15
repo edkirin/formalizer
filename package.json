@@ -1,8 +1,8 @@
 {
     "name": "@edkirin/formalizer",
-    "version": "0.1.0",
+    "version": "0.1.3",
     "description": "Simple form validity checker",
-    "main": "src/formalizer.js",
+    "main": "build/formalizer.min.js",
     "scripts": {
         "build": "webpack --mode=production --display-modules --devtool=''",
         "dev": "webpack --mode=development --watch"
@@ -15,6 +15,7 @@
         "name": "Eden Kirin",
         "email": "edkirin@gmail.com"
     },
+    "repository": "https://github.com/edkirin/formalizer",
     "license": "ISC",
     "dependencies": {},
     "devDependencies": {

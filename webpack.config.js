@@ -14,7 +14,8 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, './build'),
         filename: '[name].min.js',
-        chunkFilename: '[name].bundle.js',
+        library: '[name]',  // global lib prefix
+        libraryTarget: 'umd',
     },
     module: {
         rules: [
