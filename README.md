@@ -33,13 +33,13 @@ $ npm install @edkirin/formalizer
 ## Basic usage
 
 ```javascript
-import Formalizer from "@edkirin/formalizer";
+import { Formalizer } from "@edkirin/formalizer";
 
 const formalizer = new Formalizer({
     form: document.querySelector('#myform'),
     language: 'en',
     errorReporting: 'element',
-    validateOn: 'input',
+    validateOn: 'submit',
     handleSubmitButton: true
 });
 ```
@@ -49,7 +49,7 @@ const formalizer = new Formalizer({
 Options are set when formalizer object is created.
 
 ```javascript
-import Formalizer from "@edkirin/formalizer";
+import { Formalizer } from "@edkirin/formalizer";
 
 const formalizer = new Formalizer(options);
 ```
@@ -184,7 +184,9 @@ Form validation is triggered when input fields focus is changed.
 
 #### options.handleSubmitButton : bool
 
-If option is set to true, Formalizer will take control over form submit button and set his enabled state according to validation result.
+If option is set to true, Formalizer will take control over form submit button and set his enabled state according to validation result. 
+
+**Note**: It's not possible to use this option in conjunction with *options.validateOn = 'submit'*. If this is the case, validateOn will fallback to *input*.
 
 default: *false*
 

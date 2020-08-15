@@ -8,6 +8,7 @@ const TerserJSPlugin = require('terser-webpack-plugin');
 
 
 module.exports = {
+    target: 'web',  // or 'node'
     entry: {
         formalizer: path.resolve(__dirname, './src/formalizer.js'),
     },
@@ -16,6 +17,8 @@ module.exports = {
         filename: '[name].min.js',
         library: '[name]',  // global lib prefix
         libraryTarget: 'umd',
+        globalObject: 'this',
+        umdNamedDefine: true,
     },
     module: {
         rules: [

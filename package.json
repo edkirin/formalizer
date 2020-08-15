@@ -1,11 +1,11 @@
 {
     "name": "@edkirin/formalizer",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "description": "Simple form validity checker",
     "main": "build/formalizer.min.js",
     "scripts": {
         "build": "webpack --mode=production --display-modules --devtool=''",
-        "dev": "webpack --mode=development --watch"
+        "dev": "lite-server"
     },
     "keywords": [
         "form",
@@ -25,6 +25,7 @@
         "babel-loader": "^8.1.0",
         "clean-webpack-plugin": "^3.0.0",
         "eslint": "^7.6.0",
+        "reload": "^3.1.0",
         "webpack": "^4.44.1",
         "webpack-cli": "^3.3.12"
     }

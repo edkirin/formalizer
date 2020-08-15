@@ -3,7 +3,7 @@
 // ********************************************************************************************************************
 
 
-export default class Formalizer {
+class Formalizer {
     form = null ;
     invalidClass = 'is-invalid' ;
     validClass = 'is-valid' ;
@@ -18,6 +18,7 @@ export default class Formalizer {
 
     _translations;
     _firstInvalidElement;
+    _silent_errors = false;
 
     // ----------------------------------------------------------------------------------------------------------------
 
@@ -33,6 +34,17 @@ export default class Formalizer {
         // set default errorTemplate, if not set:
         if (this.errorTemplate === null) {
             this.errorTemplate = '<small class="form-text text-danger" id="%id">%message</small>';
+        }
+
+        if (this.handleSubmitButton) {
+            // it shouldn't be set handleSubmitButton and validation on submit.
+            // if it's the case, fallback validation on input
+            if (this.validateOn === 'submit') {
+                this.validateOn = 'input';
+            }
+            this._silent_errors = true;
+            this.validate();
+            this._silent_errors = false;
         }
 
         switch (this.validateOn) {
@@ -62,10 +74,6 @@ export default class Formalizer {
             default:
                 // default - no handling
                 break;
-        }
-
-        if (this.handleSubmitButton) {
-            this.validate();
         }
     }
 
@@ -129,7 +137,9 @@ export default class Formalizer {
                 }
             }
 
-            this.setElementValidity(element, elementValid);
+            if (!this._silent_errors) {
+                this.setElementValidity(element, elementValid);
+            }
 
             formValid &= elementValid;
         });
@@ -219,31 +229,33 @@ export default class Formalizer {
             });
         }
 
-        switch (this.errorReporting) {
-            case 'none':
-                break;
+        if (!this._silent_errors) {
+            switch (this.errorReporting) {
+                case 'none':
+                    break;
 
-            case 'hint':
-                element.setAttribute('title', errMessage);
-                break;
+                case 'hint':
+                    element.setAttribute('title', errMessage);
+                    break;
 
-            case 'element':
-                // create random id for a new error element
-                const elementId = this.randomStr(10);
+                case 'element':
+                    // create random id for a new error element
+                    const elementId = this.randomStr(10);
 
-                // create error element html
-                const errElement = this.errorTemplate.replace(/%id/, elementId).replace(/%message/, errMessage);
+                    // create error element html
+                    const errElement = this.errorTemplate.replace(/%id/, elementId).replace(/%message/, errMessage);
 
-                // set data attribute to element, pointing to error element
-                element.dataset['errElementId'] = elementId;
+                    // set data attribute to element, pointing to error element
+                    element.dataset['errElementId'] = elementId;
 
-                // finally, add error element html right after element
-                element.insertAdjacentHTML('afterend', errElement);
-                break;
+                    // finally, add error element html right after element
+                    element.insertAdjacentHTML('afterend', errElement);
+                    break;
 
-            case 'tooltip':
-                element.setAttribute('title', errMessage);
-                break;
+                case 'tooltip':
+                    element.setAttribute('title', errMessage);
+                    break;
+            }
         }
     }
 
@@ -358,3 +370,5 @@ export default class Formalizer {
 
 
 // ********************************************************************************************************************
+
+export { Formalizer };
