@@ -15,9 +15,6 @@
         "name": "Eden Kirin",
         "email": "edkirin@gmail.com"
     },
-    "publishConfig": {
-        "registry": "https://npm.pkg.github.com/"
-    },
     "license": "ISC",
     "dependencies": {},
     "devDependencies": {
