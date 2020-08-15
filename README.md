@@ -225,6 +225,19 @@ Used on:
 
 Every email input field will be automatically test for email format validity.
 
+Used on:
+
+- input fields of type email
+
+#### Check if number is valid
+
+Input fields of type *number* will be validated for number validity. Optionally, *min* and *max* values can be also validated.
+
+```html
+<input type="number" name="myfield1" min="0" max="100">
+<input type="number" name="myfield2" min="5">
+```
+
 #### Preventing validation on certain fields
 
 To prevent validation on certain fields, use *data-validate="off"*.

@@ -4,17 +4,17 @@
 
 
 export default class Formalizer {
-    form;
-    invalidClass;
-    validClass;
-    focusOnError;
-    onValidate;
-    onInvalidElement;
-    language;
-    errorReporting;
-    errorTemplate;
-    validateOn;
-    handleSubmitButton;
+    form = null ;
+    invalidClass = 'is-invalid' ;
+    validClass = 'is-valid' ;
+    focusOnError = true ;
+    onValidate = null ;
+    onInvalidElement = null ;
+    language = 'en' ;
+    errorReporting = 'element' ;  // valid values = none ; hint ; element
+    errorTemplate = null ;
+    handleSubmitButton = false ;
+    validateOn = 'submit' ;  // valid values = manual ; submit ; input ; focus
 
     _translations;
     _firstInvalidElement;
@@ -22,22 +22,9 @@ export default class Formalizer {
     // ----------------------------------------------------------------------------------------------------------------
 
     constructor(options) {
-        this.form = options.form;
-        this.invalidClass = options.hasOwnProperty('invalidClass') ? options.invalidClass : 'is-invalid';
-        this.validClass = options.hasOwnProperty('validClass') ? options.validClass : 'is-valid';
-        this.focusOnError = options.hasOwnProperty('focusOnError') ? options.focusOnError : true;
-        this.onValidate = options.hasOwnProperty('onValidate') ? options.onValidate : null;
-        this.onInvalidElement = options.hasOwnProperty('onInvalidElement') ? options.onInvalidElement : null;
-        this.language = options.hasOwnProperty('language') ? options.language : 'en';
-        // valid values: none, hint, element
-        this.errorReporting = options.hasOwnProperty('errorReporting') ? options.errorReporting : 'element';
-        this.errorTemplate = options.hasOwnProperty('errorTemplate') ? options.errorTemplate : null;
-        this.handleSubmitButton = options.hasOwnProperty('handleSubmitButton') ? options.handleSubmitButton : false;
-        // valid values: manual, submit, input, focus
-        this.validateOn = options.hasOwnProperty('validateOn') ? options.validateOn : 'submit';
+        Object.assign(this, options);
 
         // disable browser validation
-        // console.log(this.form.get());
         this.form.setAttribute('novalidate', 'novalidate');
 
         // load translations
@@ -209,10 +196,6 @@ export default class Formalizer {
                         element.dataset['errElementId'] = '';
                         }
                     break;
-
-                case 'tooltip':
-                    element.setAttribute('title', '');
-                    break;
             }
         });
     }
@@ -317,12 +300,14 @@ export default class Formalizer {
     validateEmailElement(element) {
         let result = true;
 
-        // this regex apparently checks if email address format is valid
-        const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (element.hasAttribute('required') || element.value.length > 0) {
+            // this regex apparently checks if email address format is valid
+            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-        if (!re.test(element.value.toLowerCase())) {
-            this.raiseError(element, 'invalid_email');
-            result = false;
+            if (!re.test(element.value.toLowerCase())) {
+                this.raiseError(element, 'invalid_email');
+                result = false;
+            }
         }
 
         return result;
@@ -332,20 +317,21 @@ export default class Formalizer {
 
     setElementValidity(element, value) {
         // value: possible values: true / false / null
+        const cls = element.classList;
 
         // if null, just reset elements and remove all validity classes
         if (value === null) {
-            element.classList.remove(this.validClass);
-            element.classList.remove(this.invalidClass);
+            cls.remove(this.validClass);
+            cls.remove(this.invalidClass);
         } else {
             if (value) {
                 // set element valid
-                element.classList.add(this.validClass);
-                element.classList.remove(this.invalidClass);
+                cls.add(this.validClass);
+                cls.remove(this.invalidClass);
             } else {
                 // set element invalid
-                element.classList.remove(this.validClass);
-                element.classList.add(this.invalidClass);
+                cls.remove(this.validClass);
+                cls.add(this.invalidClass);
             }
         }
     }
