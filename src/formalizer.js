@@ -29,18 +29,24 @@ export default class Formalizer {
         this.onValidate = options.hasOwnProperty('onValidate') ? options.onValidate : null;
         this.onInvalidElement = options.hasOwnProperty('onInvalidElement') ? options.onInvalidElement : null;
         this.language = options.hasOwnProperty('language') ? options.language : 'en';
-        // valid values: none, hint, tooltip, element
-        this.errorReporting = options.hasOwnProperty('errorReporting') ? options.errorReporting : 'hint';
+        // valid values: none, hint, element
+        this.errorReporting = options.hasOwnProperty('errorReporting') ? options.errorReporting : 'element';
         this.errorTemplate = options.hasOwnProperty('errorTemplate') ? options.errorTemplate : null;
         this.handleSubmitButton = options.hasOwnProperty('handleSubmitButton') ? options.handleSubmitButton : false;
         // valid values: manual, submit, input, focus
         this.validateOn = options.hasOwnProperty('validateOn') ? options.validateOn : 'submit';
 
         // disable browser validation
+        // console.log(this.form.get());
         this.form.setAttribute('novalidate', 'novalidate');
 
         // load translations
         this._translations = require('./i18n/' + this.language).translations;
+
+        // set default errorTemplate, if not set:
+        if (this.errorTemplate === null) {
+            this.errorTemplate = '<small class="form-text text-danger" id="%id">%message</small>';
+        }
 
         switch (this.validateOn) {
             case 'submit':
@@ -89,7 +95,9 @@ export default class Formalizer {
         queries.forEach((elementType) => {
             const elements = this.form.querySelectorAll(elementType);
             elements.forEach((element) => {
-                res.push(element);
+                if (element.dataset.validate !== 'off') {
+                    res.push(element);
+                }
             });
         });
 
@@ -120,6 +128,7 @@ export default class Formalizer {
                     case 'input':
                         switch (element.getAttribute('type')) {
                             case 'text':
+                            case 'password':
                                 elementValid &= this.validateTextElement(element);
                                 break;
                             case 'number':
@@ -224,7 +233,11 @@ export default class Formalizer {
             this._firstInvalidElement = element;
         }
         if (this.onInvalidElement) {
-            this.onInvalidElement(element, errorCode);
+            this.onInvalidElement({
+                formalizer: this,
+                form: this.form,
+                errMessage: errMessage,
+            });
         }
 
         switch (this.errorReporting) {
@@ -240,12 +253,7 @@ export default class Formalizer {
                 const elementId = this.randomStr(10);
 
                 // create error element html
-                let errElement;
-                if (this.errorTemplate) {
-                    errElement = this.errorTemplate.replace(/%id/, elementId).replace(/%message/, errMessage);
-                } else {
-                    errElement = `<small class="form-text text-danger" id=${elementId}>${errMessage}</small>`;
-                }
+                const errElement = this.errorTemplate.replace(/%id/, elementId).replace(/%message/, errMessage);
 
                 // set data attribute to element, pointing to error element
                 element.dataset['errElementId'] = elementId;
