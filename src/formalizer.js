@@ -38,16 +38,26 @@ export default class Formalizer {
         switch (this.validateOn) {
             case 'submit':
                 // hook to submit event
-                this.form.addEventListener('submit', this.onSubmitHandler.bind(this));
+                this.form.addEventListener('submit', (event) => {
+                    if (!this.validate()) {
+                        event.preventDefault();
+                    }
+                });
                 break;
             case 'input':
                 // hook to keyup event
-                const handler = this.onKeypressHandler.bind(this);
                 this.getElementsForValidation().forEach((element) => {
-                    element.addEventListener('keyup', handler);
+                    element.addEventListener('keyup', (event) => {
+                        this.validate();
+                    });
                 });
                 break;
             case 'focus':
+                this.getElementsForValidation().forEach((element) => {
+                    element.addEventListener('blur', (event) => {
+                        this.validate();
+                    });
+                });
                 break;
             default:
                 // default - no handling
@@ -57,20 +67,6 @@ export default class Formalizer {
         if (this.handleSubmitButton) {
             this.validate();
         }
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------
-
-    onSubmitHandler(event) {
-        if (!this.validate()) {
-            event.preventDefault();
-        }
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------
-
-    onKeypressHandler(event) {
-        this.validate();
     }
 
     // ----------------------------------------------------------------------------------------------------------------
