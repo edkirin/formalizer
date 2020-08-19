@@ -80,7 +80,10 @@ class Formalizer {
     // ----------------------------------------------------------------------------------------------------------------
 
     getElementsForValidation() {
-        const queries = ['input:not([type="hidden"])', 'textarea'];
+        const queries = [
+            'input[type="text"],input[type="number"],input[type="email"],input[type="password"]',
+            'textarea'
+        ];
         const res = [];
 
         queries.forEach((elementType) => {
