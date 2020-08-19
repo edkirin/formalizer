@@ -7,7 +7,7 @@ Simple, but flexible and configurable form validity checker.
 
 - Zero runtime dependencies
 - Compatible with Bootstrap CSS framework
-- Very small footprint - less than 8k
+- Very small footprint - less than 8k, less than 3k gzipped
 
 ## Building formalizer
 
@@ -17,7 +17,7 @@ Simple, but flexible and configurable form validity checker.
 
 ### Build from source
 
-```
+```bash
 $ git clone git@github.com:edkirin/formalizer.git
 $ cd formalizer
 $ npm install
@@ -240,6 +240,15 @@ Input fields of type *number* will be validated for number validity. Optionally,
 <input type="number" name="myfield2" min="5">
 ```
 
+#### Check if two fields are equal
+
+To ensure user entered exact value in two fields, use *data-validate-equalto* attribute and set value to other field id.
+
+```html
+<input type="password" id="password1" data-validate-equalto="#password2">
+<input type="password" id="password2" data-validate-equalto="#password1">
+```
+
 #### Preventing validation on certain fields
 
 To prevent validation on certain fields, use *data-validate="off"*.
@@ -247,3 +256,17 @@ To prevent validation on certain fields, use *data-validate="off"*.
 ```html
 <input type="text" name="myfield" data-validate="off">
 ```
+
+## Change log
+
+### 0.2.0
+
+- Added equal-to validator.
+
+### 0.1.4
+
+- Initial version.
+
+## Licence
+
+The code is available under MIT Licence.
