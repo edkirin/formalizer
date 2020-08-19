@@ -1,6 +1,6 @@
 {
     "name": "@edkirin/formalizer",
-    "version": "0.1.4",
+    "version": "0.2.0",
     "description": "Simple form validity checker",
     "main": "build/formalizer.min.js",
     "scripts": {
