@@ -26,7 +26,7 @@ $ npm run build
 
 ### Install from npm
 
-```
+```bash
 $ npm install @edkirin/formalizer
 ```
 
