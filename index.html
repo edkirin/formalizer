@@ -11,10 +11,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>Formalizer Demo 1</h1>
-
         <div class="row">
             <div class="col-sm-6 offset-sm-3">
+                <h1 class="mt-3 mb-3">
+                    Formalizer Demo 1
+                </h1>
                 <form id="myform" method="post" action="#">
                     <div class="form-group">
                         <label>
@@ -32,18 +33,26 @@
                         <label>
                             Email address
                         </label>
-                        <input type="text" class="form-control" name="xxemail" required>
+                        <input type="email" class="form-control" name="email" required>
                     </div>
                     <div class="form-group">
                         <label>
                             Secret word
                         </label>
-                        <input type="password" class="form-control" name="password" required>
+                        <input type="password" class="form-control" name="password1" id="password1" data-validate-equalto="#password2" required>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Secret word (again)
+                        </label>
+                        <input type="password" class="form-control" name="password2" id="password2" data-validate-equalto="#password1" required>
                     </div>
 
-                    <button type="submit" class="btn btn-primary float-right">
-                        Submit
-                    </button>
+                    <p class="text-right">
+                        <button type="submit" class="btn btn-primary">
+                            Submit
+                        </button>
+                    </p>
                 </form>
             </div>
         </div>
