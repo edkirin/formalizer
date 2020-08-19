@@ -137,6 +137,19 @@ class Formalizer {
                 }
             }
 
+            // if all type specific tests pass, go for additional checks
+            if (elementValid) {
+                // check data-validity-equalto
+                const equalTo = element.dataset.validateEqualto;
+                if (equalTo) {
+                    const otherElement = document.querySelector(equalTo);
+                    elementValid &= otherElement && otherElement.value === element.value;
+                    if (!elementValid) {
+                        this.raiseError(element, 'equalto_fail');
+                    }
+                }
+            }
+
             if (!this._silent_errors) {
                 this.setElementValidity(element, elementValid);
             }

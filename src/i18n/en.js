@@ -7,6 +7,7 @@ const translations = {
         'number_less_than': 'Value should be greater than or equal to %s',
         'number_greater_than': 'Value should be lower than or equal to %s',
         'invalid_email': 'Invalid email address',
+        'equalto_fail': 'This value should be the same',
 };
 
 export { translations };

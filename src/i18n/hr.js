@@ -7,6 +7,7 @@ const translations = {
     'number_less_than': 'Vrijednost treba biti jednaka ili veća od %s',
     'number_greater_than': 'Vrijednost treba biti jednaka ili manja od %s',
     'invalid_email': 'Neispravna email adresa',
+    'equalto_fail': 'Vrijednosti moraju biti iste',
 };
 
 export { translations };
