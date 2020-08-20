@@ -17,8 +17,20 @@
                     Formalizer Example 2
                 </h1>
                 <form id="myform" method="post" action="#">
-                    <p>
-                        To be done.
+                    <div class="form-group">
+                        <label>
+                            Some value
+                        </label>
+                        <input type="text" class="form-control" name="some_value" required>
+                    </div>
+
+                    <p class="text-right">
+                        <button type="button" class="btn btn-outline-primary reset">
+                            Reset
+                        </button>
+                        <button type="button" class="btn btn-primary raise_error">
+                            Raise manual error
+                        </button>
                     </p>
                 </form>
             </div>
@@ -31,9 +43,21 @@
     const fm = new window.formalizer.Formalizer({
         form: document.querySelector('#myform'),
         language: 'en',
-        errorReporting: 'hint',
+        errorReporting: 'element',
         validateOn: 'submit'
     });
+
+    document.querySelector('button.raise_error').addEventListener('click', () => {
+        fm.raiseError(
+            document.querySelector('input[name="some_value"]'),
+            "What ever value you enter, it's wrong!"
+        );
+    });
+
+    document.querySelector('button.reset').addEventListener('click', () => {
+        fm.reset();
+    });
+
 </script>
 
 </html>

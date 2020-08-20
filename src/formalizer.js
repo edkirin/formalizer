@@ -153,7 +153,9 @@ class Formalizer {
                 }
             }
 
-            if (!this._silent_errors) {
+            // if element is valid, just remove invalidity class
+            // if element is invalid, invalidity class is already handled in raiseError()
+            if (!this._silent_errors && elementValid) {
                 this.setElementValidity(element, elementValid);
             }
 
@@ -216,7 +218,7 @@ class Formalizer {
                         errElement.remove();
                         // reset dataset
                         element.dataset['errElementId'] = '';
-                        }
+                    }
                     break;
             }
         });
@@ -225,7 +227,12 @@ class Formalizer {
     // ----------------------------------------------------------------------------------------------------------------
 
     raiseError(element, errorCode, params) {
-        let errMessage = this.getTranslationString(errorCode);
+        // element already marked with error? exit
+        if (element.dataset['errElementId']) {
+            return;
+        }
+
+        let errMessage = this.getTranslationString(errorCode) || errorCode;
 
         // replace value placeholders with provided params
         if (params) {
@@ -272,6 +279,11 @@ class Formalizer {
                     element.setAttribute('title', errMessage);
                     break;
             }
+        }
+
+        // mark element as invalid
+        if (!this._silent_errors) {
+            this.setElementValidity(element, false);
         }
     }
 
@@ -364,8 +376,8 @@ class Formalizer {
 
     getTranslationString(id) {
         return this._translations && this._translations.hasOwnProperty(id) ?
-        this._translations[id] :
-            'Unknown translation id ' + id;
+            this._translations[id] :
+            null;
     }
 
     // ----------------------------------------------------------------------------------------------------------------

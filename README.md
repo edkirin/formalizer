@@ -190,6 +190,41 @@ If option is set to true, Formalizer will take control over form submit button a
 
 default: *false*
 
+### API
+
+#### validate()
+
+Manually triggers form validity check, regardless of *validateOn* option.
+
+```javascript
+const formalizer = new window.formalizer.Formalizer({
+    ...
+});
+
+formalizer.validate();
+```
+
+#### reset()
+
+Resets form and sets all elements to unvalidated state.
+
+```javascript
+formalizer.reset();
+```
+
+#### raiseError(element, errorMessage)
+
+Method manually raises error on element with provided error message.
+
+```javascript
+formalizer.raiseError(
+    document.querySelector('input[name="email"]'),
+    "Email address already exists!"
+);
+```
+
+
+
 ### Markup
 
 Formalizer will perform validation checks on:
@@ -258,6 +293,10 @@ To prevent validation on certain fields, use *data-validate="off"*.
 ```
 
 ## Change log
+
+### 0.2.1
+
+- Added manual raising error with raiseError() method.
 
 ### 0.2.0
 
